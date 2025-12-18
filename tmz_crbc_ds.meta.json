@@ -1,0 +1,8 @@
+{
+  "note": "True-BC via big-domain + interior crops; ghost=one-ring outside crop from true fields; multi-crops/episode; four sides per crop; 2x5 patch + deriv + pos; CFL-safe to avoid PML echoes; geometry/sources confined to crop; corner oversampled.",
+  "T": 32,
+  "warmup": 200,
+  "patch_radius": 2,
+  "crops_per_episode": "2-5",
+  "corner_rep": 2
+}
