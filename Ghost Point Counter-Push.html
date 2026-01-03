@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NP-SSM-CRBC Step 2: E-Field Update (Formula Fixed)</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            display: flex;
+            justify_content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+        .figure-container {
+            background: white;
+            padding: 20px;
+        }
+        
+        /* === Refined Font Sizes === */
+        text { font-family: 'Helvetica', 'Arial', sans-serif; }
+        
+        .label-text { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            font-size: 11px; 
+            font-weight: 600; 
+            fill: #444; 
+        }
+        
+        .sub-label { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            font-size: 10px; 
+            fill: #777; 
+        }
+        
+        .math-text { 
+            font-family: 'Times New Roman', Times, serif; 
+            font-style: italic; 
+            font-size: 14px; 
+            font-weight: normal;
+            fill: #333;
+        }
+        
+        .math-equation {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 17px; 
+            fill: #000;
+        }
+        
+        .sub-script { 
+            baseline-shift: sub; 
+            font-size: 0.7em; 
+            font-style: normal; 
+        }
+        .super-script { 
+            baseline-shift: super; 
+            font-size: 0.7em; 
+            font-style: normal; 
+        }
+
+        .grid-line { stroke: #e5e5e5; stroke-width: 1; }
+        .boundary-line { stroke: #222; stroke-width: 2.0; stroke-dasharray: 6, 4; }
+        .ghost-bg { fill: url(#diagonalHatch); }
+        
+        .calculation-diamond {
+            fill: rgba(255, 255, 255, 0.9);
+            stroke: #ccc;
+            stroke-width: 1;
+            stroke-dasharray: 3, 3;
+        }
+
+        .update-arrow { 
+            stroke: #444; 
+            stroke-width: 1.5; 
+            fill: none; 
+            marker-end: url(#arrowhead-black); 
+        }
+
+        .ghost-prediction-highlight {
+            fill: none;
+            stroke: #ea4335;
+            stroke-width: 1.5;
+            stroke-dasharray: 4, 3;
+        }
+
+        .target-e-highlight {
+            fill: rgba(66, 133, 244, 0.15);
+            stroke: #4285f4;
+            stroke-width: 1.5;
+        }
+
+        .ez-node { fill: #4285f4; stroke: #fff; stroke-width: 1.5; } 
+        .h-path { stroke: #ea4335; fill: none; stroke-width: 2; stroke-linecap: round; } 
+        
+        .callout-box {
+            fill: #fff;
+            stroke: #e0e0e0;
+            stroke-width: 1;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.03));
+        }
+    </style>
+</head>
+<body>
+
+<div class="figure-container">
+    <svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <marker id="arrowhead-black" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+                <polygon points="0 0, 7 2.5, 0 5" fill="#444" />
+            </marker>
+            
+            <pattern id="diagonalHatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="12" style="stroke:#f8f8f8; stroke-width:2" />
+            </pattern>
+
+            <g id="Ez"> <circle r="4" class="ez-node" /> </g>
+            <g id="Hx"> <path d="M 0 -5 L 0 5 M -2.5 2.5 L 0 5 L 2.5 2.5" class="h-path" transform="scale(0.8)"/> </g>
+            <g id="Hy"> <path d="M -5 0 L 5 0 M 2.5 -2.5 L 5 0 L 2.5 2.5" class="h-path" transform="scale(0.8)"/> </g>
+        </defs>
+
+        <!-- 1. Backgrounds -->
+        <rect x="0" y="0" width="1000" height="600" fill="#fff" /> 
+        <rect x="50" y="50" width="450" height="500" fill="#fcfcfc" /> 
+        <rect x="500" y="50" width="450" height="500" class="ghost-bg" /> 
+
+        <!-- 2. Grid Lines (Spacing 100px) -->
+        <g class="grid-lines">
+            <line x1="150" y1="50" x2="150" y2="550" class="grid-line"/>
+            <line x1="250" y1="50" x2="250" y2="550" class="grid-line"/>
+            <line x1="350" y1="50" x2="350" y2="550" class="grid-line"/>
+            <line x1="450" y1="50" x2="450" y2="550" class="grid-line"/> 
+            <line x1="550" y1="50" x2="550" y2="550" class="grid-line"/>
+
+            <line x1="50" y1="100" x2="950" y2="100" class="grid-line"/>
+            <line x1="50" y1="200" x2="950" y2="200" class="grid-line"/>
+            <line x1="50" y1="300" x2="950" y2="300" class="grid-line"/> 
+            <line x1="50" y1="400" x2="950" y2="400" class="grid-line"/>
+            <line x1="50" y1="500" x2="950" y2="500" class="grid-line"/>
+        </g>
+
+        <!-- 3. Boundary -->
+        <line x1="500" y1="40" x2="500" y2="560" class="boundary-line" />
+        <text x="490" y="40" text-anchor="end" class="label-text">COMPUTATION DOMAIN</text>
+        <text x="510" y="40" text-anchor="start" class="label-text" fill="#ea4335">GHOST REGION</text>
+
+        <!-- 4. Context Fields (Dimmed) -->
+        <g opacity="0.25">
+            <use href="#Ez" x="350" y="200"/><use href="#Ez" x="350" y="300"/><use href="#Ez" x="350" y="400"/>
+            <use href="#Ez" x="250" y="200"/><use href="#Ez" x="250" y="300"/><use href="#Ez" x="250" y="400"/>
+            <use href="#Ez" x="450" y="200"/><use href="#Ez" x="450" y="400"/>
+            <use href="#Hx" x="350" y="250"/><use href="#Hx" x="350" y="350"/>
+            <use href="#Hy" x="300" y="300"/><use href="#Hy" x="400" y="200"/><use href="#Hy" x="400" y="400"/>
+        </g>
+
+        <!-- 5. Active Update Mechanism -->
+        <polygon points="450,250 500,300 450,350 400,300" fill="rgba(240, 248, 255, 0.6)" stroke="#ddd" stroke-dasharray="3,3" />
+
+        <g>
+            <use href="#Hx" x="450" y="250" /><text x="450" y="238" text-anchor="middle" class="math-text">H<tspan class="sub-script">x</tspan></text>
+            <use href="#Hx" x="450" y="350" />
+            <use href="#Hy" x="400" y="300" /><text x="385" y="295" text-anchor="end" class="math-text">H<tspan class="sub-script">y</tspan></text>
+        </g>
+
+        <g>
+            <circle cx="500" cy="300" r="14" class="ghost-prediction-highlight" />
+            <use href="#Hy" x="500" y="300" />
+            <text x="520" y="295" text-anchor="start" class="math-text" fill="#ea4335">H<tspan class="sub-script">y, ghost</tspan></text>
+            <text x="520" y="312" class="sub-label" fill="#ea4335">(From Neural Net)</text>
+        </g>
+
+        <g>
+            <circle cx="450" cy="300" r="18" class="target-e-highlight" />
+            <use href="#Ez" x="450" y="300" transform="translate(-225, -150) scale(1.5)" /> 
+            <text x="430" y="335" text-anchor="end" class="math-text" font-weight="bold" fill="#4285f4">E<tspan class="sub-script">z</tspan></text>
+        </g>
+
+        <!-- Update Flow Arrows -->
+        <path d="M 450 260 L 450 282" class="update-arrow" />
+        <path d="M 450 340 L 450 318" class="update-arrow" />
+        <path d="M 410 300 L 432 300" class="update-arrow" />
+        <path d="M 490 300 L 468 300" class="update-arrow" stroke="#ea4335" />
+
+        <!-- 6. Fixed Equation Callout -->
+        <g transform="translate(620, 240)">
+            <rect x="0" y="0" width="310" height="100" rx="6" class="callout-box" />
+            
+            <!-- Combined Formula string for perfect alignment -->
+            <text x="25" y="48" class="math-equation">
+                E<tspan class="sub-script">z</tspan><tspan class="super-script">n+1</tspan> = 
+                E<tspan class="sub-script">z</tspan><tspan class="super-script">n</tspan> + 
+                C · ( <tspan fill="#ea4335">H<tspan class="sub-script">y, ghost</tspan></tspan> - 
+                H<tspan class="sub-script">y, int</tspan> ··· )
+            </text>
+            
+            <text x="25" y="75" class="sub-label" style="fill:#555;">
+                Standard FDTD update using predicted values.
+            </text>
+        </g>
+
+        <!-- 7. Annotations -->
+        <text x="450" y="160" text-anchor="middle" class="label-text" fill="#555">Yee Cell Update Loop</text>
+        <path d="M 450 170 L 450 220" stroke="#aaa" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrowhead-black)"/>
+
+        <!-- 8. Legend -->
+        <g transform="translate(150, 560)">
+            <rect x="0" y="0" width="600" height="30" fill="none" stroke="#eee" rx="4" />
+            <g transform="translate(40, 15)">
+                <circle r="4" class="ez-node"/><text x="12" y="4" class="label-text">Target E-Field</text>
+            </g>
+            <g transform="translate(220, 15)">
+                <path d="M -5 0 L 5 0 M 2 -2 L 5 0 L 2 2" stroke="#ea4335" stroke-width="2" fill="none"/><text x="12" y="4" class="label-text">Source H-Field</text>
+            </g>
+            <g transform="translate(400, 15)">
+                <circle r="7" class="ghost-prediction-highlight"/><text x="12" y="4" class="label-text">Predicted Ghost Field</text>
+            </g>
+        </g>
+    </svg>
+</div>
+
+</body>
+</html>

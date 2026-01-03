@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NP-SSM-CRBC FDTD Schematic (Cell Press Style)</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            display: flex;
+            justify_content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+        }
+        .figure-container {
+            background: white;
+            padding: 20px;
+        }
+        
+        /* === Cell Press Style Font Configuration === */
+        text { font-family: 'Helvetica', 'Arial', sans-serif; }
+        
+        .label-text { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            font-size: 13px; 
+            font-weight: 600; 
+            fill: #444; 
+        }
+        
+        .sub-label { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            font-size: 11px; 
+            fill: #777; 
+        }
+        
+        .math-text { 
+            font-family: 'Times New Roman', Times, serif; 
+            font-style: italic; 
+            font-size: 15px; 
+            font-weight: normal;
+        }
+        
+        .sub-script { 
+            baseline-shift: sub; 
+            font-size: 0.7em; 
+            font-style: normal; 
+        }
+        /* === End Font Configuration === */
+
+        .grid-line { stroke: #e0e0e0; stroke-width: 1; }
+        /* Boundary Line moved to x=560 to overlap with Hy column */
+        .boundary-line { stroke: #222; stroke-width: 2.5; stroke-dasharray: 8, 5; }
+        
+        .ghost-bg { fill: url(#diagonalHatch); }
+        .stencil-box { 
+            fill: rgba(66, 133, 244, 0.06); 
+            stroke: #4285f4; 
+            stroke-width: 2; 
+            stroke-dasharray: 5, 3; 
+            rx: 8; 
+        }
+        .nn-box { 
+            fill: #fff; 
+            stroke: #333; 
+            stroke-width: 1.5; 
+            filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.1)); 
+        }
+
+        .flow-arrow { 
+            stroke: #555; 
+            stroke-width: 1.5; 
+            fill: none; 
+            marker-end: url(#arrowhead); 
+        }
+        .prediction-arrow { 
+            stroke: #ea4335; 
+            stroke-width: 2; 
+            fill: none; 
+            stroke-dasharray: 4, 3; 
+            marker-end: url(#arrowhead-red); 
+        }
+        .flow-arrow-blue {
+            stroke: #4285f4;
+            stroke-width: 1.8;
+            fill: none;
+            stroke-dasharray: 5, 4;
+            marker-end: url(#arrowhead);
+        }
+        .ez-node { fill: #4285f4; stroke: #fff; stroke-width: 1.5; } 
+        .h-path { stroke: #ea4335; fill: none; stroke-width: 2; stroke-linecap: round; } 
+        .ghost-highlight { 
+            fill: rgba(234, 67, 53, 0.1); 
+            stroke: #ea4335; 
+            stroke-width: 2; 
+            stroke-dasharray: 3, 2; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="figure-container">
+    <svg width="1000" height="600" viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#555" />
+            </marker>
+            <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#ea4335" />
+            </marker>
+            
+            <pattern id="diagonalHatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="12" style="stroke:#f4f4f4; stroke-width:2" />
+            </pattern>
+
+            <g id="Ez"> <circle r="4" class="ez-node" /> </g>
+            <g id="Hx"> <path d="M 0 -6 L 0 6 M -3 3 L 0 6 L 3 3" class="h-path" transform="scale(0.8)"/> </g>
+            <g id="Hy"> <path d="M -6 0 L 6 0 M 3 -3 L 6 0 L 3 3" class="h-path" transform="scale(0.8)"/> </g>
+        </defs>
+
+        <!-- 1. Backgrounds -->
+        <rect x="0" y="0" width="1000" height="600" fill="#fff" /> 
+        <rect x="50" y="50" width="510" height="480" fill="#fcfcfc" /> 
+        <!-- Ghost region starts at 560 now -->
+        <rect x="560" y="50" width="390" height="480" class="ghost-bg" /> 
+
+        <!-- 2. Grid Lines -->
+        <g class="grid-lines">
+            <!-- Vertical Lines -->
+            <line x1="110" y1="50" x2="110" y2="530" class="grid-line"/>
+            <line x1="170" y1="50" x2="170" y2="530" class="grid-line"/>
+            <line x1="230" y1="50" x2="230" y2="530" class="grid-line"/>
+            <line x1="290" y1="50" x2="290" y2="530" class="grid-line"/>
+            <line x1="350" y1="50" x2="350" y2="530" class="grid-line"/>
+            <line x1="410" y1="50" x2="410" y2="530" class="grid-line"/>
+            <line x1="470" y1="50" x2="470" y2="530" class="grid-line"/>
+            <line x1="530" y1="50" x2="530" y2="530" class="grid-line"/>
+            <!-- x=590 is the virtual line in ghost region -->
+            <line x1="590" y1="50" x2="590" y2="530" class="grid-line"/>
+
+            <!-- Horizontal Lines -->
+            <line x1="50" y1="110" x2="950" y2="110" class="grid-line"/>
+            <line x1="50" y1="170" x2="950" y2="170" class="grid-line"/>
+            <line x1="50" y1="230" x2="950" y2="230" class="grid-line"/>
+            <line x1="50" y1="290" x2="950" y2="290" class="grid-line"/> 
+            <line x1="50" y1="350" x2="950" y2="350" class="grid-line"/>
+            <line x1="50" y1="410" x2="950" y2="410" class="grid-line"/>
+            <line x1="50" y1="470" x2="950" y2="470" class="grid-line"/>
+        </g>
+
+        <!-- 3. Boundary: Moved to x=560 (Half integer step, overlapping Hy column) -->
+        <line x1="560" y1="40" x2="560" y2="540" class="boundary-line" />
+        <text x="550" y="40" text-anchor="end" class="label-text">COMPUTATION DOMAIN</text>
+        <text x="570" y="40" text-anchor="start" class="label-text" fill="#ea4335">GHOST REGION</text>
+
+        <!-- 4. Input Stencil Box -->
+        <!-- Center x approx 500. Box covers 470 and 530. -->
+        <rect x="450" y="150" width="100" height="280" class="stencil-box" />
+        
+        <!-- Text Centered on Stencil Box (x=500) -->
+        <text x="500" y="125" text-anchor="middle" class="label-text" fill="#4285f4">Input Stencil</text>
+        <text x="500" y="142" text-anchor="middle" class="label-text" fill="#4285f4">(Local Patch)</text>
+
+        <!-- 5. Populating Fields -->
+        <g id="field-population">
+            
+            <!-- A. DIM Group (Background) -->
+            <g opacity="0.4">
+                <!-- Left Columns... -->
+                <use href="#Ez" x="110" y="110"/><use href="#Ez" x="110" y="170"/><use href="#Ez" x="110" y="230"/><use href="#Ez" x="110" y="290"/><use href="#Ez" x="110" y="350"/><use href="#Ez" x="110" y="410"/><use href="#Ez" x="110" y="470"/>
+                <use href="#Hx" x="110" y="140"/><use href="#Hx" x="110" y="200"/><use href="#Hx" x="110" y="260"/><use href="#Hx" x="110" y="320"/><use href="#Hx" x="110" y="380"/><use href="#Hx" x="110" y="440"/>
+                <use href="#Hy" x="140" y="110"/><use href="#Hy" x="140" y="170"/><use href="#Hy" x="140" y="230"/><use href="#Hy" x="140" y="290"/><use href="#Hy" x="140" y="350"/><use href="#Hy" x="140" y="410"/><use href="#Hy" x="140" y="470"/>
+
+                <use href="#Ez" x="170" y="110"/><use href="#Ez" x="170" y="170"/><use href="#Ez" x="170" y="230"/><use href="#Ez" x="170" y="290"/><use href="#Ez" x="170" y="350"/><use href="#Ez" x="170" y="410"/><use href="#Ez" x="170" y="470"/>
+                <use href="#Hx" x="170" y="140"/><use href="#Hx" x="170" y="200"/><use href="#Hx" x="170" y="260"/><use href="#Hx" x="170" y="320"/><use href="#Hx" x="170" y="380"/><use href="#Hx" x="170" y="440"/>
+                <use href="#Hy" x="200" y="110"/><use href="#Hy" x="200" y="170"/><use href="#Hy" x="200" y="230"/><use href="#Hy" x="200" y="290"/><use href="#Hy" x="200" y="350"/><use href="#Hy" x="200" y="410"/><use href="#Hy" x="200" y="470"/>
+
+                <use href="#Ez" x="230" y="110"/><use href="#Ez" x="230" y="170"/><use href="#Ez" x="230" y="230"/><use href="#Ez" x="230" y="290"/><use href="#Ez" x="230" y="350"/><use href="#Ez" x="230" y="410"/><use href="#Ez" x="230" y="470"/>
+                <use href="#Hx" x="230" y="140"/><use href="#Hx" x="230" y="200"/><use href="#Hx" x="230" y="260"/><use href="#Hx" x="230" y="320"/><use href="#Hx" x="230" y="380"/><use href="#Hx" x="230" y="440"/>
+                <use href="#Hy" x="260" y="110"/><use href="#Hy" x="260" y="170"/><use href="#Hy" x="260" y="230"/><use href="#Hy" x="260" y="290"/><use href="#Hy" x="260" y="350"/><use href="#Hy" x="260" y="410"/><use href="#Hy" x="260" y="470"/>
+
+                <use href="#Ez" x="290" y="110"/><use href="#Ez" x="290" y="170"/><use href="#Ez" x="290" y="230"/><use href="#Ez" x="290" y="290"/><use href="#Ez" x="290" y="350"/><use href="#Ez" x="290" y="410"/><use href="#Ez" x="290" y="470"/>
+                <use href="#Hx" x="290" y="140"/><use href="#Hx" x="290" y="200"/><use href="#Hx" x="290" y="260"/><use href="#Hx" x="290" y="320"/><use href="#Hx" x="290" y="380"/><use href="#Hx" x="290" y="440"/>
+                <use href="#Hy" x="320" y="110"/><use href="#Hy" x="320" y="170"/><use href="#Hy" x="320" y="230"/><use href="#Hy" x="320" y="290"/><use href="#Hy" x="320" y="350"/><use href="#Hy" x="320" y="410"/><use href="#Hy" x="320" y="470"/>
+
+                <use href="#Ez" x="350" y="110"/><use href="#Ez" x="350" y="170"/><use href="#Ez" x="350" y="230"/><use href="#Ez" x="350" y="290"/><use href="#Ez" x="350" y="350"/><use href="#Ez" x="350" y="410"/><use href="#Ez" x="350" y="470"/>
+                <use href="#Hx" x="350" y="140"/><use href="#Hx" x="350" y="200"/><use href="#Hx" x="350" y="260"/><use href="#Hx" x="350" y="320"/><use href="#Hx" x="350" y="380"/><use href="#Hx" x="350" y="440"/>
+                <use href="#Hy" x="380" y="110"/><use href="#Hy" x="380" y="170"/><use href="#Hy" x="380" y="230"/><use href="#Hy" x="380" y="290"/><use href="#Hy" x="380" y="350"/><use href="#Hy" x="380" y="410"/><use href="#Hy" x="380" y="470"/>
+
+                <use href="#Ez" x="410" y="110"/><use href="#Ez" x="410" y="170"/><use href="#Ez" x="410" y="230"/><use href="#Ez" x="410" y="290"/><use href="#Ez" x="410" y="350"/><use href="#Ez" x="410" y="410"/><use href="#Ez" x="410" y="470"/>
+                <use href="#Hx" x="410" y="140"/><use href="#Hx" x="410" y="200"/><use href="#Hx" x="410" y="260"/><use href="#Hx" x="410" y="320"/><use href="#Hx" x="410" y="380"/><use href="#Hx" x="410" y="440"/>
+                <use href="#Hy" x="440" y="110"/><use href="#Hy" x="440" y="170"/><use href="#Hy" x="440" y="230"/><use href="#Hy" x="440" y="290"/><use href="#Hy" x="440" y="350"/><use href="#Hy" x="440" y="410"/><use href="#Hy" x="440" y="470"/>
+
+                <!-- Top/Bottom Rows around Stencil -->
+                <use href="#Ez" x="470" y="110"/> <use href="#Ez" x="470" y="470"/>
+                <use href="#Hx" x="470" y="140"/> <use href="#Hx" x="470" y="440"/>
+                <use href="#Hy" x="500" y="110"/> <use href="#Hy" x="500" y="470"/>
+
+                <use href="#Ez" x="530" y="110"/> <use href="#Ez" x="530" y="470"/>
+                <use href="#Hx" x="530" y="140"/> <use href="#Hx" x="530" y="440"/>
+                
+                <!-- Hy COLUMN AT BOUNDARY (x=560) -->
+                <!-- These create the "Vertical line of red arrows" that the boundary overlaps -->
+                <use href="#Hy" x="560" y="110"/>
+                <use href="#Hy" x="560" y="170"/>
+                <use href="#Hy" x="560" y="230"/>
+                <!-- y=290 is the bright Ghost node -->
+                <use href="#Hy" x="560" y="350"/>
+                <use href="#Hy" x="560" y="410"/>
+                <use href="#Hy" x="560" y="470"/>
+            </g>
+
+            <!-- B. BRIGHT Group (Input Stencil) -->
+            <g opacity="1.0">
+                <!-- Column 470 -->
+                <use href="#Ez" x="470" y="170"/><use href="#Ez" x="470" y="230"/><use href="#Ez" x="470" y="290"/><use href="#Ez" x="470" y="350"/><use href="#Ez" x="470" y="410"/>
+                <use href="#Hx" x="470" y="200"/><use href="#Hx" x="470" y="260"/><use href="#Hx" x="470" y="320"/><use href="#Hx" x="470" y="380"/>
+                
+                <!-- Column 530 -->
+                <use href="#Ez" x="530" y="170"/><use href="#Ez" x="530" y="230"/><use href="#Ez" x="530" y="290"/><use href="#Ez" x="530" y="350"/><use href="#Ez" x="530" y="410"/>
+                <use href="#Hx" x="530" y="200"/><use href="#Hx" x="530" y="260"/><use href="#Hx" x="530" y="320"/><use href="#Hx" x="530" y="380"/>
+
+                <!-- Internal Hy (x=500) -->
+                <use href="#Hy" x="500" y="170"/><use href="#Hy" x="500" y="230"/><use href="#Hy" x="500" y="290"/><use href="#Hy" x="500" y="350"/><use href="#Hy" x="500" y="410"/>
+            </g>
+        </g>
+
+        <!-- 6. NEURAL NETWORK -->
+        <g transform="translate(680, 80)">
+            <rect x="0" y="0" width="200" height="90" rx="6" class="nn-box" />
+            <text x="100" y="30" text-anchor="middle" class="label-text" style="font-size: 16px;">NP-SSM-CRBC</text>
+            <text x="100" y="55" text-anchor="middle" class="sub-label">Passive State-Space Model</text>
+            <text x="100" y="70" text-anchor="middle" class="sub-label">Neural Boundary Condition</text>
+            
+            <circle cx="40" cy="45" r="3" fill="#4285f4"/>
+            <circle cx="160" cy="45" r="3" fill="#ea4335"/>
+            <line x1="50" y1="45" x2="150" y2="45" stroke="#eee" stroke-width="1"/>
+        </g>
+
+        <!-- 7. GHOST NODE (Moved to x=560, overlapping Boundary) -->
+        <g id="ghost-group">
+            <circle cx="560" cy="290" r="18" class="ghost-highlight" />
+            <!-- Ghost Hy -->
+            <path d="M 554 290 L 566 290 M 563 287 L 566 290 L 563 293" stroke="#ea4335" stroke-width="3" stroke-dasharray="2,1" fill="none"/>
+            <text x="590" y="330" text-anchor="middle" class="math-text" fill="#ea4335">H<tspan class="sub-script">y, ghost</tspan></text>
+        </g>
+
+        <!-- 8. CONNECTIONS -->
+        <!-- Source: Center of Stencil (x=500, y=290) -->
+        <path
+        d="M 545 240 C 580 270, 600 105, 680 105"
+        class="flow-arrow-blue"
+        />
+        <text x="630" y="200" class="label-text" fill="#4285f4" font-size="12">Extracted Features</text>
+
+        <!-- Destination: Ghost Node at x=560 -->
+        <path d="M 780 170 C 780 250, 700 290, 588 290" class="prediction-arrow" />
+        <text x="790" y="220" class="label-text" fill="#ea4335" font-size="12">Predicted Value</text>
+
+        <!-- 9. LEGEND -->
+        <g transform="translate(150, 550)">
+            <rect x="0" y="0" width="700" height="40" fill="none" stroke="#eee" rx="5" />
+            
+            <g transform="translate(50, 20)">
+                <circle r="4" class="ez-node"/>
+                <text x="15" y="4" class="label-text">E-Field (E<tspan class="sub-script">z</tspan>)</text>
+            </g>
+
+            <g transform="translate(200, 20)">
+                <path d="M -5 0 L 5 0 M 2 -2 L 5 0 L 2 2" stroke="#ea4335" stroke-width="2" fill="none"/>
+                <text x="15" y="4" class="label-text">H-Field (H<tspan class="sub-script">x</tspan>, H<tspan class="sub-script">y</tspan>)</text>
+            </g>
+
+            <g transform="translate(400, 20)">
+                <rect x="-10" y="-8" width="20" height="16" class="stencil-box"/>
+                <text x="20" y="4" class="label-text">Input Stencil (Domain)</text>
+            </g>
+
+            <g transform="translate(600, 20)">
+                <circle r="8" class="ghost-highlight"/>
+                <text x="15" y="4" class="label-text">Ghost Target</text>
+            </g>
+        </g>
+
+    </svg>
+</div>
+
+</body>
+</html>
